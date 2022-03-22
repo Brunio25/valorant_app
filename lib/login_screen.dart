@@ -7,39 +7,11 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation _animation;
+class _LoginScreenState extends State<LoginScreen> {
+  final TextStyle loginLabelStyle = const TextStyle(
+      color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold);
 
-  FocusNode _focusNode = FocusNode();
-
-  @override
-  void initState() {
-    super.initState();
-
-    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
-    _animation = Tween(begin: 300, end: 50).animate(_controller)
-    ..addListener(() {
-      setState(() { });
-    });
-
-    _focusNode.addListener(() {
-      if (_focusNode.hasFocus) {
-        _controller.forward();
-      }
-      else {
-        _controller.reverse();
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    _focusNode.dispose();
-
-    super.dispose();
-  }
+  bool _rememberMe = false; //TODO bloc
 
   Widget usernameField() {
     return TextFormField(
@@ -56,7 +28,6 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
               color: Theme.of(context).primaryColor),
           hintStyle: const TextStyle(color: Colors.white),
           hintText: "Username"),
-      focusNode: _focusNode,
     );
   }
 
@@ -76,7 +47,26 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
               color: Theme.of(context).primaryColor),
           hintStyle: const TextStyle(color: Colors.white),
           hintText: "Password"),
-      focusNode: _focusNode,
+    );
+  }
+
+  Widget loginButton() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 35),
+      child: ElevatedButton(
+          onPressed: () {},
+          style: ButtonStyle(
+            elevation: MaterialStateProperty.all<double>(5),
+              backgroundColor:
+                  MaterialStateProperty.all(Theme.of(context).primaryColor),
+              shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                  RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(50))),
+              fixedSize: MaterialStateProperty.all<Size>(Size(200, 70))),
+          child: Text("LOGIN", style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),)),
     );
   }
 
@@ -87,7 +77,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
         color: Color(0xFF101822),
       ),
       child: Scaffold(
-        resizeToAvoidBottomInset: false,
+        resizeToAvoidBottomInset: true,
         backgroundColor: Colors.transparent,
         body: InkWell(
           enableFeedback: false,
@@ -96,24 +86,59 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
           onTap: () {
             FocusScope.of(context).requestFocus(FocusNode());
           },
-          child: Column(
-            children: [
-              const SizedBox(height: 40),
-              const Image(
-                image: AssetImage("assets/images/background_image.png"),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(40.0),
-                child: Column(
-                  children: [
-                    SizedBox(height: _animation.value),                      //TODO animation
-                    usernameField(),
-                    SizedBox(height: 30),
-                    passwordField()
-                  ],
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                const SizedBox(height: 40),
+                const Image(
+                  image: AssetImage("assets/images/background_image.png"),
                 ),
-              )
-            ],
+                Padding(
+                  padding: const EdgeInsets.all(40.0),
+                  child: Column(
+                    children: [
+                      usernameField(),
+                      SizedBox(height: 25),
+                      passwordField(),
+                      GestureDetector(
+                        onTap: () {},
+                        child: Container(
+                          padding: EdgeInsets.only(top: 7),
+                          alignment: Alignment.centerRight,
+                          child: Text(
+                            "Forgot Password?",
+                            style: loginLabelStyle,
+                          ),
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          Container(
+                            alignment: Alignment.centerLeft,
+                            child: Checkbox(
+                              value: _rememberMe,
+                              onChanged: (value) {
+                                setState(() {
+                                  _rememberMe = value!;
+                                });
+                              },
+                              activeColor: Theme.of(context).primaryColor,
+                              checkColor: Colors.white,
+                              side: BorderSide(color: Colors.white),
+                            ),
+                          ),
+                          Text(
+                            "Remember me",
+                            style: loginLabelStyle,
+                          )
+                        ],
+                      ),
+                      loginButton()
+                    ],
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       ),
